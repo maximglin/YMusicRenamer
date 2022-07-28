@@ -13,17 +13,20 @@ try
         Name.Replace("musicdb_", "").Replace(".sqlite", "") ?? throw new Exception();
 
     var dbPath = new DirectoryInfo(path).GetFiles("*.sqlite", SearchOption.AllDirectories).FirstOrDefault()?.FullName ?? throw new Exception();
-    var trackPath = @$"folder/Music/{name}/";
+    var trackPath = new DirectoryInfo(path).
+        GetDirectories().Where(d => d.Name == "Music").FirstOrDefault()?.
+        GetDirectories().Where(d => d.Name == name).FirstOrDefault()?.FullName ?? throw new Exception();
 
-    var picFiles = new DirectoryInfo(@"folder/CachedCovers/").GetFiles("*", SearchOption.AllDirectories);
+    var picFiles = new DirectoryInfo(path).
+        GetDirectories().Where(d => d.Name == "CachedCovers").FirstOrDefault()?.
+        GetFiles("*", SearchOption.AllDirectories) ?? throw new Exception();
 
     using var dbCon = new SQLiteConnection(string.Format("Data Source={0};", new FileInfo(dbPath).FullName));
     dbCon.Open();
 
     Console.Write("Enter save path:");
     var savePath = Console.ReadLine().Replace("\"", "");
-    if(!(savePath.EndsWith("/") || savePath.EndsWith(@"\")))
-        savePath += "/";
+    savePath = new DirectoryInfo(savePath).FullName + "/";
 
     Console.Write("Group in folders by Artist? 0 - 1:");
     var flag = Console.ReadLine();
