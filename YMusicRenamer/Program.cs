@@ -50,7 +50,7 @@ try
                 var preformersIds = QueryMultiple($"select ArtistId from T_TrackArtist where TrackId={id};");
 
                 List<string> preformers = new();
-                foreach (var aId in preformersIds)
+                foreach (var aId in preformersIds.Reverse())
                 {
                     var p = Query($"select Name from T_Artist where Id={aId}");
                     if (p is not null)
@@ -93,6 +93,31 @@ try
                 nfile.Tag.AlbumArtists = Query($"select ArtistsString from T_Album where Id={Query($"select AlbumId from T_TrackAlbum where TrackId={id};")}")
                     ?.Split(",") ?? Array.Empty<string>();
 
+                //set the first performer to main performer
+                //under the assumption that album artist is main performer
+                if (
+                nfile.Tag.AlbumArtists.Length > 0 &&
+                nfile.Tag.Performers.Length > 1 &&
+                nfile.Tag.AlbumArtists.Length < nfile.Tag.Performers.Length
+                ) 
+                {
+                    var fartist = nfile.Tag.AlbumArtists[0].ToLower();
+                    if (nfile.Tag.Performers.Any(p => p.ToLower() == fartist))
+                    {
+                        var indexToSwap = nfile.Tag.Performers.Select((p, i) => new { Name = p, Index = i }).Where(p => p.Name.ToLower() == fartist).First().Index;
+                        
+                        if(indexToSwap != 0)
+                        {
+                            var arr = nfile.Tag.Performers;
+
+                            var t = arr[0];
+                            arr[0] = arr[indexToSwap];
+                            arr[indexToSwap] = t;
+
+                            nfile.Tag.Performers = arr;
+                        }
+                    }
+                }
 
                 nfile.Save();
 
