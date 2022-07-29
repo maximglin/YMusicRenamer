@@ -90,8 +90,6 @@ try
 
 
                 nfile.Tag.Album = Query($"select Title from T_Album where Id={Query($"select AlbumId from T_TrackAlbum where TrackId={id};")}");
-                if (nfile.Tag.Album?.Contains("Банда") ?? false)
-                    Console.Write("f");
                 nfile.Tag.AlbumArtists = Query($"select ArtistsString from T_Album where Id={Query($"select AlbumId from T_TrackAlbum where TrackId={id};")}")
                     ?.Split(",") ?? Array.Empty<string>();
 
