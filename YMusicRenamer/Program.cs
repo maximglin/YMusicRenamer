@@ -90,6 +90,8 @@ try
 
 
                 nfile.Tag.Album = Query($"select Title from T_Album where Id={Query($"select AlbumId from T_TrackAlbum where TrackId={id};")}");
+                if (nfile.Tag.Album?.Contains("Банда") ?? false)
+                    Console.Write("f");
                 nfile.Tag.AlbumArtists = Query($"select ArtistsString from T_Album where Id={Query($"select AlbumId from T_TrackAlbum where TrackId={id};")}")
                     ?.Split(",") ?? Array.Empty<string>();
 
@@ -97,8 +99,7 @@ try
                 //under the assumption that album artist is main performer
                 if (
                 nfile.Tag.AlbumArtists.Length > 0 &&
-                nfile.Tag.Performers.Length > 1 &&
-                nfile.Tag.AlbumArtists.Length < nfile.Tag.Performers.Length
+                nfile.Tag.Performers.Length > 1
                 ) 
                 {
                     var fartist = nfile.Tag.AlbumArtists[0].ToLower();
