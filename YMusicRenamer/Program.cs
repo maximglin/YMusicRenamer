@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Linq;
 using System.Data.Entity;
+using System.Text;
 
 
 try
@@ -31,6 +32,18 @@ try
     Console.Write("Group in folders by Artist? 0 - 1:");
     var flag = Console.ReadLine();
     bool group = !flag.Contains("0");
+
+    Console.Write("Translit into latin? 0 - 1:");
+    var transl = Console.ReadLine();
+    bool translit = !transl.Contains("0");
+
+    bool translitTags = false;
+    if(translit)
+    {
+        Console.Write("Translit tags in latin too? 0 - 1:");
+        var transl2 = Console.ReadLine();
+        translitTags = !transl2.Contains("0");
+    }
 
 
     List<Task> tasks = new();
@@ -118,6 +131,17 @@ try
                     }
                 }
 
+
+                if(translitTags)
+                {
+                    nfile.Tag.Performers = nfile.Tag.Performers.Select(s => s.Translit()).ToArray();
+                    nfile.Tag.Title = nfile.Tag.Title.Translit();
+                    nfile.Tag.Lyrics = nfile.Tag.Lyrics.Translit();
+                    nfile.Tag.Album = nfile.Tag.Album.Translit();
+                    nfile.Tag.AlbumArtists = nfile.Tag.AlbumArtists.Select(s => s.Translit()).ToArray();
+                }
+
+
                 nfile.Save();
 
                 string per = "";
@@ -140,6 +164,12 @@ try
                 foreach (var c in illegal)
                     tit = tit.Replace(c.ToString(), "");
 
+                
+                if(!translitTags && translit)
+                {
+                    per = per.Translit();
+                    tit = tit.Translit();
+                }
 
                 string filename = "";
                 if (per.Length > 0)
@@ -253,5 +283,10 @@ static class Ext
             str = str.Replace("☺", " (");
         }
         return str;   
+    }
+
+    public static string Translit(this string s)
+    {
+        return RussianTransliteration.RussianTransliterator.GetTransliteration(s);
     }
 }
