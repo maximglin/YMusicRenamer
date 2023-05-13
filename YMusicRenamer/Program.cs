@@ -29,9 +29,9 @@ try
     var savePath = Console.ReadLine().Replace("\"", "");
     savePath = new DirectoryInfo(savePath).FullName + "/";
 
-    Console.Write("Group in folders by Artist? 0 - 1:");
+    Console.Write("Group in folders? 0 (no); 1(by artist); 2(by alphabet):");
     var flag = Console.ReadLine();
-    bool group = !flag.Contains("0");
+    GroupType group = flag.Contains("0") ? GroupType.No : (flag.Contains("1") ? GroupType.Artist : GroupType.Alphabet);
 
     Console.Write("Translit into latin? 0 - 1:");
     var transl = Console.ReadLine();
@@ -195,9 +195,12 @@ try
 
                 var savepath = savePath;
 
-                if (group && per.Length > 0)
+                if ((group == GroupType.Artist || group == GroupType.Alphabet) && per.Length > 0)
                 {
-                    savepath = savepath + per + "\\";
+                    if(group == GroupType.Artist)
+                        savepath = savepath + per + "\\";
+                    else if(group == GroupType.Alphabet)
+                        savepath = savepath + per.First().ToString() + "\\";
 
                     lock (lock_obj)
                     {
@@ -264,7 +267,12 @@ catch
 
 
 
-
+enum GroupType
+{
+    No,
+    Artist,
+    Alphabet
+}
 
 
 static class Ext
