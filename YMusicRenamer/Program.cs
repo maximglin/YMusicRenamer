@@ -50,7 +50,7 @@ try
 
     var lock_obj = new object();
     Dictionary<string, int> names = new();
-    foreach (var file in new DirectoryInfo(trackPath).GetFiles("*", SearchOption.AllDirectories))
+    foreach (var file in new DirectoryInfo(trackPath).GetFiles("*", SearchOption.TopDirectoryOnly))
         tasks.Add(Task.Run(() =>
         {
             try
